@@ -18,19 +18,24 @@ public class FPSDescentControls : MonoBehaviour
     public float _inertiaDrag;
 
     private Rigidbody _rigid;
-    private Vector3 _requestedRelativeThrust;
-    private Vector3 _requestedRelativeTorque;
+    public Vector3 requestedRelativeThrust { get; private set; }
+    public Vector3 requestedRelativeTorque { get; private set; }
 
     // Start is called before the first frame update
     void Start()
     {
         _rigid = GetComponentInChildren<Rigidbody>();
+
+        //this doesn't seem to work in a dual screen setup. I can move the cursor to the second monitor and click.
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
     }
 
     private void Update()
     {
-        float torquePitch = Input.GetAxis("Mouse Y");
-        float torqueYaw = Input.GetAxis("Mouse X");
+
+        float torquePitch = Cursor.lockState == CursorLockMode.Locked ? 0: Input.GetAxis("Mouse Y");
+        float torqueYaw = Cursor.lockState == CursorLockMode.Locked ? 0 : Input.GetAxis("Mouse X");
         float torqueRoll = Input.GetAxis("Roll");
 
         //rotation damping
@@ -50,15 +55,15 @@ public class FPSDescentControls : MonoBehaviour
         if (Mathf.Abs(thrustForward) < 0.1) thrustForward = -relVel.z * _inertiaDrag;
 
         //these 2 variables will be used in fixedUpdate:
-        _requestedRelativeTorque = new Vector3(torquePitch, torqueYaw, torqueRoll);
-        _requestedRelativeThrust = new Vector3(thrustRight, thrustUp, thrustForward);
+        requestedRelativeTorque = new Vector3(torquePitch, torqueYaw, torqueRoll);
+        requestedRelativeThrust = new Vector3(thrustRight, thrustUp, thrustForward);
 
     }
 
     private void FixedUpdate()
     {
-        _rigid.AddRelativeTorque(_requestedRelativeTorque);
-        _rigid.AddRelativeForce(_requestedRelativeThrust);
+        _rigid.AddRelativeTorque(requestedRelativeTorque);
+        _rigid.AddRelativeForce(requestedRelativeThrust);
 
         LimitSpeed();
     }
@@ -74,7 +79,7 @@ public class FPSDescentControls : MonoBehaviour
         relativeForward = Mathf.Sign(relativeForward) * Mathf.Min(Mathf.Abs(relativeForward), _maxSpeed.z);
 
         vel = new Vector3(relativeRight, relativeUp, relativeForward);
-        DebugText.ShowVector("relative velocity", vel);
+        //DebugText.ShowVector("relative velocity", vel);
         vel = transform.TransformVector(vel);
 
         _rigid.velocity = vel;

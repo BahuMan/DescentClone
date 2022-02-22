@@ -137,8 +137,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7db6f5da3caf59b46a85c25adb0aa655, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 50
-  growTime: 0.01
+  speed: 100
+  growTime: 0.005
   maxLifeTime: 10
   particlePrefab: {fileID: 5722791614141705866, guid: a658e891244e32449b606cf383e8f0ed,
     type: 3}
